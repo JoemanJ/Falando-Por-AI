@@ -1,0 +1,80 @@
+Configuration	SWD
+STM32CubeMX 	6.14.1
+Date	07/20/2025
+MCU	STM32F411CEUx
+
+
+
+PERIPHERALS	MODES	FUNCTIONS	PINS
+ADC1	IN1	ADC1_IN1	PA1
+I2S2	Full-Duplex Master	I2S2_CK	PB13
+I2S2	Full-Duplex Master	I2S2_SD	PB15
+I2S2	Full-Duplex Master	I2S2_WS	PB12
+I2S2	Full-Duplex Master	I2S2_ext_SD	PB14
+SYS	Serial Wire	SYS_JTCK-SWCLK	PA14
+SYS	Serial Wire	SYS_JTMS-SWDIO	PA13
+SYS	SysTick	SYS_VS_Systick	VP_SYS_VS_Systick
+TIM2	Internal Clock	TIM2_VS_ClockSourceINT	VP_TIM2_VS_ClockSourceINT
+
+
+
+Pin Nb	PINs	FUNCTIONs	LABELs
+2	PC13-ANTI_TAMP	GPIO_Output	LED_PIN
+10	PA0-WKUP	GPIO_EXTI0	KEY
+11	PA1	ADC1_IN1	
+25	PB12	I2S2_WS	
+26	PB13	I2S2_CK	
+27	PB14	I2S2_ext_SD	
+28	PB15	I2S2_SD	
+34	PA13	SYS_JTMS-SWDIO	
+37	PA14	SYS_JTCK-SWCLK	
+PERIPHERALS	MODES	FUNCTIONS	PINS
+ADC1	IN1	ADC1_IN1	PA1
+I2S2	Full-Duplex Master	I2S2_CK	PB13
+I2S2	Full-Duplex Master	I2S2_SD	PB15
+I2S2	Full-Duplex Master	I2S2_WS	PB12
+I2S2	Full-Duplex Master	I2S2_ext_SD	PB14
+SYS	Serial Wire	SYS_JTCK-SWCLK	PA14
+SYS	Serial Wire	SYS_JTMS-SWDIO	PA13
+SYS	SysTick	SYS_VS_Systick	VP_SYS_VS_Systick
+TIM2	Internal Clock	TIM2_VS_ClockSourceINT	VP_TIM2_VS_ClockSourceINT
+
+
+
+Pin Nb	PINs	FUNCTIONs	LABELs
+2	PC13-ANTI_TAMP	GPIO_Output	LED_PIN
+10	PA0-WKUP	GPIO_EXTI0	KEY
+11	PA1	ADC1_IN1	
+25	PB12	I2S2_WS	
+26	PB13	I2S2_CK	
+27	PB14	I2S2_ext_SD	
+28	PB15	I2S2_SD	
+34	PA13	SYS_JTMS-SWDIO	
+37	PA14	SYS_JTCK-SWCLK	
+
+
+
+SOFTWARE PROJECT
+
+Project Settings : 
+Project Name : SWD
+Project Folder : /home/diogo/Desktop/estudos/PIC2/SWD
+Toolchain / IDE : STM32CubeIDE
+Firmware Package Name and Version : STM32Cube FW_F4 V1.28.2
+
+
+Code Generation Settings : 
+STM32Cube MCU packages and embedded software packs : Copy only the necessary library files
+Generate peripheral initialization as a pair of '.c/.h' files per peripheral : Yes
+Backup previously generated files when re-generating : No
+Delete previously generated files when not re-generated : Yes
+Set all free pins as analog (to optimize the power consumption) : Yes
+
+
+Toolchains Settings : 
+Compiler Optimizations : 
+
+
+
+
+

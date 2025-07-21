@@ -19,6 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "adc.h"
+#include "i2s.h"
 #include "tim.h"
 #include "gpio.h"
 
@@ -34,7 +35,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define BUFFER_SIZE 4096
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -45,7 +46,12 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-uint16_t convs[8] = { 0 };
+uint16_t IN_BUFFER[BUFFER_SIZE] = {0};
+uint16_t OUT_BUFFER[BUFFER_SIZE] = {0};
+
+uint16_t* curr_in_buffer = &(IN_BUFFER[0]);
+uint16_t* curr_out_buffer = &(OUT_BUFFER[BUFFER_SIZE/2]);
+
 uint8_t flag = 0;
 /* USER CODE END PV */
 
@@ -90,8 +96,11 @@ int main(void)
   MX_GPIO_Init();
   MX_ADC1_Init();
   MX_TIM2_Init();
+  MX_I2S2_Init();
   /* USER CODE BEGIN 2 */
-
+  HAL_TIM_Base_Start(&htim2);
+  HAL_ADC_Start_DMA(&hadc1, (uint32_t*)curr_in_buffer, BUFFER_SIZE/2);
+  HAL_I2S_Transmit_DMA(&hi2s2, (uint16_t*)curr_out_buffer, BUFFER_SIZE);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -155,13 +164,34 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-//void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-//	if (GPIO_Pin == KEY_Pin) {
-//		HAL_ADC_Start_DMA(&hadc1, (uint32_t*) convs, 8);
-//	}
-//	return;
-//}
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+	if (GPIO_Pin == KEY_Pin) {
+		HAL_GPIO_TogglePin(LED_PIN_GPIO_Port, LED_PIN_Pin);
+	}
+	return;
+}
 
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
+{
+	static uint16_t i = 0;
+	i++;
+	if (i==10){
+		HAL_GPIO_TogglePin(LED_PIN_GPIO_Port, LED_PIN_Pin);
+		i = 0;
+	}
+}
+
+void HAL_I2S_TxHalfCpltCallback(I2S_HandleTypeDef *hi2s)
+{
+	curr_in_buffer = &(IN_BUFFER[BUFFER_SIZE/2]);
+	curr_out_buffer = &(OUT_BUFFER[0]);
+}
+
+void HAL_I2S_TxCpltCallback(I2S_HandleTypeDef *hi2s)
+{
+	curr_in_buffer = &(IN_BUFFER[0]);
+	curr_out_buffer = &(OUT_BUFFER[BUFFER_SIZE/2]);
+}
 /* USER CODE END 4 */
 
 /**

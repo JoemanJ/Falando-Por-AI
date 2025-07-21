@@ -80,7 +80,7 @@ void EXTI0_IRQHandler(void)
   /* USER CODE BEGIN EXTI0_IRQn 0 */
 
   /* USER CODE END EXTI0_IRQn 0 */
-  HAL_GPIO_EXTI_IRQHandler(KEY_PIN_Pin);
+  HAL_GPIO_EXTI_IRQHandler(KEY_Pin);
   /* USER CODE BEGIN EXTI0_IRQn 1 */
 
   /* USER CODE END EXTI0_IRQn 1 */
@@ -100,25 +100,12 @@ void DMA1_Stream4_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles SPI2 global interrupt.
-  */
-void SPI2_IRQHandler(void)
-{
-  /* USER CODE BEGIN SPI2_IRQn 0 */
-
-  /* USER CODE END SPI2_IRQn 0 */
-  /* USER CODE BEGIN SPI2_IRQn 1 */
-
-  /* USER CODE END SPI2_IRQn 1 */
-}
-
-/**
   * @brief This function handles DMA2 stream0 global interrupt.
   */
 void DMA2_Stream0_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA2_Stream0_IRQn 0 */
-
+	HAL_GPIO_TogglePin(LED_PIN_GPIO_Port, LED_PIN_Pin);
   /* USER CODE END DMA2_Stream0_IRQn 0 */
   /* USER CODE BEGIN DMA2_Stream0_IRQn 1 */
 
