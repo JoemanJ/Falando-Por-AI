@@ -60,8 +60,8 @@ all: main-build
 main-build: Falando\ por\ AI.elf secondary-outputs
 
 # Tool invocations
-Falando\ por\ AI.elf Falando\ por\ AI.map: $(OBJS) $(USER_OBJS) /home/diogodb/STM32CubeIDE/workspace_1.19.0/Falando\ por\ AI/STM32F411CEUX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "Falando por AI.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"/home/diogodb/STM32CubeIDE/workspace_1.19.0/Falando por AI/STM32F411CEUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Falando por AI.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Falando\ por\ AI.elf Falando\ por\ AI.map: $(OBJS) $(USER_OBJS) /home/diogo/Desktop/estudos/PIC2/Falando-Por-AI/STM32F411CEUX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "Falando por AI.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"/home/diogo/Desktop/estudos/PIC2/Falando-Por-AI/STM32F411CEUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Falando por AI.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
