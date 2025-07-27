@@ -26,7 +26,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "audio_processing.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -97,7 +97,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start(&htim2);
   HAL_ADC_Start_DMA(&hadc1, (uint32_t*) IN_BUFFER, BUFFER_SIZE);
-  HAL_I2S_Transmit_DMA(hi2s, pData, Size)
+  HAL_I2S_Transmit_DMA(&hi2s2, (uint16_t*) process_out_buffer, BUFFER_SIZE*2);
 
   /* USER CODE END 2 */
 
@@ -164,20 +164,7 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-uint16_t count = 0;
-void HAL_ADC_ConvCpltCallback (ADC_HandleTypeDef * hadc)
-{
-	if(hadc->Instance == ADC1)
-		{
-			count++;
-			if (count == 47)
-			{
-				count = 0;
-				HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-			}
-			HAL_ADC_Start_DMA(&hadc1, (uint32_t*) IN_BUFFER, BUFFER_SIZE);
-		}
-}
+
 /* USER CODE END 4 */
 
 /**

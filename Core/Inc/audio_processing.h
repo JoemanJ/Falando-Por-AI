@@ -5,28 +5,34 @@
  *      Author: diogo
  */
 
-#define BUFFER_SIZE 1024
-
-extern uint16_t IN_BUFFER;
-extern int32_t OUT_BUFFER;
-
 #ifndef INC_AUDIO_PROCESSING_H_
 #define INC_AUDIO_PROCESSING_H_
 
-// Clamps an int value 'X" between min and max
-inline uint16_t clamp(uint16_t min, uint16_t x, uint16_t max);
+#include "inttypes.h"
 
+#define BUFFER_SIZE 1024
+#define AUDIO_VOLUME 0.1
+
+extern uint16_t IN_BUFFER[BUFFER_SIZE];
+extern int32_t OUT_BUFFER[BUFFER_SIZE*2];
+
+extern uint16_t* process_in_buffer;
+extern int32_t* process_out_buffer;
+
+// Clamps an int value 'X" between min and max
+uint16_t clamp(uint16_t min, uint16_t x, uint16_t max);
 /*
 	Receives a 12 bits unsigned audio input between 310 and 2792 and maps it
 	into a float value between -1.0 and 1.0
 */
-inline float normalizeAudio(uint16_t input);
+float normalizeAudio(uint16_t input);
 
 /*
  * Receives a normalized audio input between -1.0 and 1.0 and converts it into
  * a signed 24bits uint32_t value, left-justified.
  */
-inline uint32_t deNormalizeAudio(float input);
+int32_t deNormalizeAudio(float input);
+
 
 /*
  * TODO

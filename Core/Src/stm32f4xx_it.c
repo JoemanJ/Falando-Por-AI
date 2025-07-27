@@ -22,6 +22,8 @@
 #include "stm32f4xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "adc.h"
+#include "audio_processing.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -41,7 +43,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
-static uint32_t count = 0;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -242,19 +244,37 @@ void DMA2_Stream0_IRQHandler(void)
   /* USER CODE END DMA2_Stream0_IRQn 1 */
 }
 
-/* USER CODE BEGIN 1 */
-void HAL_TIM_PeriodElapsedCallback (TIM_HandleTypeDef * htim)
+uint32_t count_i2s = 0;
+void HAL_I2S_TxHalfCpltCallback (I2S_HandleTypeDef * hi2s)
 {
-	if(htim->Instance == TIM2)
+	HAL_ADC_Start_DMA(&hadc1, (uint32_t*) process_in_buffer, BUFFER_SIZE/2);
+	count_i2s++;
+	if (count_i2s == 48)
 	{
-		count++;
-		if (count == 48484)
-		{
-			count = 0;
-			HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-		}
+		count_i2s = 0;
+		HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
 	}
+	process_in_buffer = &(IN_BUFFER[0]);
+	process_out_buffer = &(OUT_BUFFER[0]);
+	processHalfBuffer();
 }
+
+void HAL_I2S_TxCpltCallback (I2S_HandleTypeDef * hi2s)
+{
+	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)process_in_buffer, BUFFER_SIZE/2);
+	process_in_buffer = &(IN_BUFFER[BUFFER_SIZE/2]);
+	process_out_buffer = &(OUT_BUFFER[BUFFER_SIZE]);
+	processHalfBuffer();
+}
+
+/* USER CODE BEGIN 1 */
+//void HAL_TIM_PeriodElapsedCallback (TIM_HandleTypeDef * htim)
+//{
+//	if(htim->Instance == TIM2)
+//	{
+//		HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+//	}
+//}
 
 
 /* USER CODE END 1 */

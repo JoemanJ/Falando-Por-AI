@@ -1,5 +1,7 @@
 "./Core/Src/adc.o"
+"./Core/Src/audio_processing.o"
 "./Core/Src/dma.o"
+"./Core/Src/filters.o"
 "./Core/Src/gpio.o"
 "./Core/Src/i2s.o"
 "./Core/Src/main.o"

@@ -1,0 +1,17 @@
+../Core/Src/filters.c:18:6:lpf_init	1
+../Core/Src/filters.c:25:6:hpf_init	1
+../Core/Src/filters.c:35:6:echo_init	2
+../Core/Src/filters.c:45:6:reverb_init	2
+../Core/Src/filters.c:57:6:pitchshifter_init	1
+../Core/Src/filters.c:70:7:apply_lpf	1
+../Core/Src/filters.c:76:7:apply_hpf	1
+../Core/Src/filters.c:83:7:apply_distortion	3
+../Core/Src/filters.c:89:7:apply_echo	1
+../Core/Src/filters.c:99:7:apply_reverb	1
+../Core/Src/filters.c:110:14:lerp	1
+../Core/Src/filters.c:115:7:apply_pitchshifter	2
+../Core/Src/filters.c:147:6:equalizer_init	1
+../Core/Src/filters.c:163:6:darthvader_init	1
+../Core/Src/filters.c:183:7:apply_equalizer	1
+../Core/Src/filters.c:199:7:apply_volume_gain	3
+../Core/Src/filters.c:213:7:apply_darthvader	1
