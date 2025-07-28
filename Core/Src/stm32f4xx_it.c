@@ -247,7 +247,7 @@ void DMA2_Stream0_IRQHandler(void)
 uint32_t count_i2s = 0;
 void HAL_I2S_TxHalfCpltCallback (I2S_HandleTypeDef * hi2s)
 {
-	HAL_ADC_Start_DMA(&hadc1, (uint32_t*) process_in_buffer, BUFFER_SIZE/2);
+	HAL_ADC_Start_DMA(&hadc1, (uint32_t*) &(IN_BUFFER[BUFFER_SIZE/2]), BUFFER_SIZE/2);
 	count_i2s++;
 	if (count_i2s == 48)
 	{
@@ -261,7 +261,7 @@ void HAL_I2S_TxHalfCpltCallback (I2S_HandleTypeDef * hi2s)
 
 void HAL_I2S_TxCpltCallback (I2S_HandleTypeDef * hi2s)
 {
-	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)process_in_buffer, BUFFER_SIZE/2);
+	HAL_ADC_Start_DMA(&hadc1, (uint32_t*) &(IN_BUFFER[0]), BUFFER_SIZE/2);
 	process_in_buffer = &(IN_BUFFER[BUFFER_SIZE/2]);
 	process_out_buffer = &(OUT_BUFFER[BUFFER_SIZE]);
 	processHalfBuffer();

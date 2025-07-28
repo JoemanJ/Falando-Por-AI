@@ -11,7 +11,7 @@
 #include "inttypes.h"
 
 #define BUFFER_SIZE 1024
-#define AUDIO_VOLUME 0.1
+#define AUDIO_VOLUME 0.01
 
 extern uint16_t IN_BUFFER[BUFFER_SIZE];
 extern int32_t OUT_BUFFER[BUFFER_SIZE*2];
@@ -42,6 +42,6 @@ void processHalfBuffer();
 /*
  * Placeholder audio processing function that applies no effect
  */
-float processAudio(uint16_t input);
+float processAudio(float input);
 
 #endif /* INC_AUDIO_PROCESSING_H_ */
