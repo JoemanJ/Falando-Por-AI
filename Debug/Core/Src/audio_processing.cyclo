@@ -1,5 +1,5 @@
 ../Core/Src/audio_processing.c:16:17:clamp	1
 ../Core/Src/audio_processing.c:27:14:normalizeAudio	1
-../Core/Src/audio_processing.c:40:16:deNormalizeAudio	4
-../Core/Src/audio_processing.c:89:6:processHalfBuffer	2
-../Core/Src/audio_processing.c:113:7:processAudio	1
+../Core/Src/audio_processing.c:40:16:deNormalizeAudio	1
+../Core/Src/audio_processing.c:49:6:processHalfBuffer	2
+../Core/Src/audio_processing.c:73:7:processAudio	1

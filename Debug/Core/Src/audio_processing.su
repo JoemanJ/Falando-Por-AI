@@ -1,5 +1,5 @@
 ../Core/Src/audio_processing.c:16:17:clamp	16	static
 ../Core/Src/audio_processing.c:27:14:normalizeAudio	16	static
-../Core/Src/audio_processing.c:40:16:deNormalizeAudio	24	static
-../Core/Src/audio_processing.c:89:6:processHalfBuffer	24	static
-../Core/Src/audio_processing.c:113:7:processAudio	16	static
+../Core/Src/audio_processing.c:40:16:deNormalizeAudio	16	static
+../Core/Src/audio_processing.c:49:6:processHalfBuffer	24	static
+../Core/Src/audio_processing.c:73:7:processAudio	16	static

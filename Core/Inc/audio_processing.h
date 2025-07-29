@@ -11,13 +11,13 @@
 #include "inttypes.h"
 
 #define BUFFER_SIZE 1024
-#define AUDIO_VOLUME 0.01
+#define AUDIO_VOLUME 0.025
 
 extern uint16_t IN_BUFFER[BUFFER_SIZE];
-extern int32_t OUT_BUFFER[BUFFER_SIZE*2];
+extern int16_t OUT_BUFFER[BUFFER_SIZE*2];
 
 extern uint16_t* process_in_buffer;
-extern int32_t* process_out_buffer;
+extern int16_t* process_out_buffer;
 
 // Clamps an int value 'X" between min and max
 uint16_t clamp(uint16_t min, uint16_t x, uint16_t max);
@@ -31,7 +31,7 @@ float normalizeAudio(uint16_t input);
  * Receives a normalized audio input between -1.0 and 1.0 and converts it into
  * a signed 24bits uint32_t value, left-justified.
  */
-int32_t deNormalizeAudio(float input);
+int16_t deNormalizeAudio(float input);
 
 
 /*
