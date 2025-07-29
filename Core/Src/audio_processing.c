@@ -58,7 +58,7 @@ void processHalfBuffer()
 	{
 		int_input = process_in_buffer[i];
 		normalized_input = normalizeAudio(int_input);
-		normalized_output = processAudio(normalized_input) * AUDIO_VOLUME; // COLOCAR EFEITO AQUI
+		normalized_output = processAudio(normalized_input) * OUTPUT_VOLUME; // COLOCAR EFEITO AQUI
 		int_output = deNormalizeAudio(normalized_output);
 		process_out_buffer[2*i] = int_output;
 		process_out_buffer[2*i+1] = int_output;

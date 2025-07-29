@@ -11,7 +11,7 @@
 #include "inttypes.h"
 
 #define BUFFER_SIZE 1024
-#define AUDIO_VOLUME 0.025
+#define OUTPUT_VOLUME 0.5
 
 extern uint16_t IN_BUFFER[BUFFER_SIZE];
 extern int16_t OUT_BUFFER[BUFFER_SIZE*2];
