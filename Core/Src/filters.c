@@ -16,10 +16,10 @@
 
 // Initialize the low-pass filter
 void lpf_init(LPF *f, float cutoff_freq, float sample_rate) {
-    float dt = 1.0f / sample_rate;                  // Time step
+	float dt = 1.0f / sample_rate;                  // Time step
     float RC = 1.0f / (2.0f * M_PI * cutoff_freq);  // RC time constant
     f->alpha = dt / (RC + dt);                      // Alpha coefficient
-    f->prev = 0.0f;                                 // Previous output sample                                           
+    f->prev = 0.0f;                                 // Previous output sample
 }
 
 void hpf_init(HPF *f, float cutoff_freq, float sample_rate) {
@@ -214,8 +214,8 @@ float apply_darthvader(DarthVader* dv, float x) {
 
     x = apply_pitchshifter(&dv->ps, x);                 // Apply pitch shifter
     x = apply_distortion(x, dv->distortion_threshold);  // Apply distortion
-    x = apply_equalizer(&dv->eq, x);                    // then equalizer
-    x = apply_reverb(&dv->reverb, x);                   // reverb
+	x = apply_equalizer(&dv->eq, x);                    // then equalizer
+	x = apply_reverb(&dv->reverb, x);                   // reverb
     x = apply_volume_gain(x, dv->volume_gain);          // volume gain last
 
     return x;

@@ -11,13 +11,15 @@
 #include "inttypes.h"
 
 #define BUFFER_SIZE 1024
-#define OUTPUT_VOLUME 0.5
+#define OUTPUT_VOLUME 1
 
 extern uint16_t IN_BUFFER[BUFFER_SIZE];
 extern int16_t OUT_BUFFER[BUFFER_SIZE*2];
 
 extern uint16_t* process_in_buffer;
 extern int16_t* process_out_buffer;
+
+void filters_init();
 
 // Clamps an int value 'X" between min and max
 uint16_t clamp(uint16_t min, uint16_t x, uint16_t max);

@@ -12,9 +12,9 @@ float process_sample(float x) {
     if (!initialized) {
         float sample_rate = 44100.0f; // Or use the actual sampleRate variable
         darthvader_init(&dv, 
-                        1.5f,  // low_gain
-                        0.5f,  // mid_gain
-                        0.5f,  // high_gain
+                        2.5f,  // low_gain
+                        1.5f,  // mid_gain
+                        1.5f,  // high_gain
                         200.0f, // low_cutoff
                         5000.0f, // high_cutoff
                         0.90f,   // pitch_factor
@@ -22,7 +22,7 @@ float process_sample(float x) {
                         0.15f,   // reverb_feedback
                         0.55f,   // reverb_mix
                         0.7f,   // distortion_threshold
-                        1.5f,   // volume_gain
+                        2.5f,   // volume_gain
                         sample_rate);
         initialized = 1;
     }
