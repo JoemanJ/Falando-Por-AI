@@ -1,6 +1,6 @@
-../Core/Src/audio_processing.c:22:13:filters_init	1
-../Core/Src/audio_processing.c:53:17:clamp	1
-../Core/Src/audio_processing.c:64:14:normalizeAudio	1
-../Core/Src/audio_processing.c:77:16:deNormalizeAudio	1
-../Core/Src/audio_processing.c:86:6:processHalfBuffer	2
-../Core/Src/audio_processing.c:110:7:processAudio	5
+../Core/Src/audio_processing.c:23:13:filters_init	1
+../Core/Src/audio_processing.c:59:17:clamp	1
+../Core/Src/audio_processing.c:70:14:normalizeAudio	1
+../Core/Src/audio_processing.c:83:16:deNormalizeAudio	1
+../Core/Src/audio_processing.c:92:6:processHalfBuffer	2
+../Core/Src/audio_processing.c:116:7:processAudio	7

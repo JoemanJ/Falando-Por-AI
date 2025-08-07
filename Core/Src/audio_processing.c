@@ -19,6 +19,7 @@ LPF lpf;
 HPF hpf;
 Reverb optimus_prime;
 DarthVader dv;
+PitchShifter hps, lps;
 inline void filters_init()
 {
 	//DarthVader
@@ -48,6 +49,11 @@ inline void filters_init()
 
 	float hpf_cutoff = 500;
 	hpf_init(&hpf, hpf_cutoff, samplerate);
+
+	float pitch_factor_high = 1.3;
+	float pitch_factor_low = 0.7;
+	pitchshifter_init(&hps, pitch_factor_high, samplerate);
+	pitchshifter_init(&lps, pitch_factor_low, samplerate);
 }
 
 inline uint16_t clamp(uint16_t min, uint16_t x, uint16_t max)
@@ -125,6 +131,14 @@ float processAudio(float input)
 
 		case HIGH_PASS:
 			return apply_hpf(&hpf, input);
+			break;
+
+		case LOW_PITCH:
+			return apply_pitchshifter(&lps, input);
+			break;
+
+		case HIGH_PITCH:
+			return apply_pitchshifter(&hps, input);
 			break;
 
 		default:
