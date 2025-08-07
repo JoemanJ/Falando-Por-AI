@@ -17,7 +17,7 @@ int16_t* process_out_buffer = &(OUT_BUFFER[BUFFER_SIZE]);
 float samplerate = 48000;
 LPF lpf;
 HPF hpf;
-Reverb r;
+Reverb optimus_prime;
 DarthVader dv;
 inline void filters_init()
 {
@@ -31,8 +31,8 @@ inline void filters_init()
 	                        0.80f,   // pitch_factor
 	                        20.0f,  // reverb_delay_ms
 	                        0.15f,   // reverb_feedback
-	                        0.55f,   // reverb_mix
-	                        0.7f,   // distortion_threshold
+	                        0.35f,   // reverb_mix
+	                        0.3f,   // distortion_threshold
 	                        1.5f,   // volume_gain
 							samplerate);
 
@@ -40,7 +40,7 @@ inline void filters_init()
 	float r_delayms = 100;
 	float r_feedback = 0.8;
 	float r_mix = 0.5;
-	reverb_init(&r, r_delayms, r_feedback, r_mix, samplerate);
+	reverb_init(&optimus_prime, r_delayms, r_feedback, r_mix, samplerate);
 
 	//
 	float lpf_cutoff = 2000;
@@ -109,5 +109,38 @@ void processHalfBuffer()
  */
 float processAudio(float input)
 {
-	return  apply_darthvader(&dv, input);
+	switch (CURRENT_FILTER)
+	{
+		case DARTH_VADER:
+			return apply_darthvader(&dv, input);
+			break;
+
+		case OPTIMUS_PRIME:
+			return apply_reverb(&optimus_prime, input);
+			break;
+
+		case LOW_PASS:
+			return apply_lpf(&lpf, input);
+			break;
+
+		case HIGH_PASS:
+			return apply_hpf(&hpf, input);
+			break;
+
+		default:
+			CURRENT_FILTER = 0;
+			return processAudio(input);
+
+//		case REVERB:
+//			return apply_reverb(&optimus_prime, input);
+//			break;
+//
+//		case DISTORTION:
+//			return apply_distortion(&distortion, input);
+//			break;
+//
+//		case ECHO:
+//			return apply_echo(&echo, input);
+//			break;
+	}
 }

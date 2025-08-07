@@ -3,4 +3,4 @@
 ../Core/Src/audio_processing.c:64:14:normalizeAudio	1
 ../Core/Src/audio_processing.c:77:16:deNormalizeAudio	1
 ../Core/Src/audio_processing.c:86:6:processHalfBuffer	2
-../Core/Src/audio_processing.c:110:7:processAudio	1
+../Core/Src/audio_processing.c:110:7:processAudio	5

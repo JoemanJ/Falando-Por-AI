@@ -7,6 +7,17 @@
 //                                                 BASE FILTERS SECTION
 // ======================================================================================================================
 
+enum FILTER {DARTH_VADER,
+			 OPTIMUS_PRIME,
+			 LOW_PASS,
+			 HIGH_PASS,
+//			 REVERB,
+//			 DISTORTION,
+//			 ECHO,
+			 };
+
+extern enum FILTER CURRENT_FILTER;
+
 // --------------------
 // Base Filters Header
 // --------------------

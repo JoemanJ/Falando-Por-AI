@@ -1,10 +1,12 @@
-#include "../Inc/filters.h"
+#include "filters.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>  // for memset
 
 #define M_PI 3.14159265358979323846f
+
+enum FILTER CURRENT_FILTER = DARTH_VADER;
 
 // =================================================================================================================================
 //                                                          Basic Filter Section
