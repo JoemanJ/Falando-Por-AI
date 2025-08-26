@@ -1,3 +1,4 @@
+"./Core/Src/LCD1602.o"
 "./Core/Src/adc.o"
 "./Core/Src/audio_processing.o"
 "./Core/Src/dma.o"
