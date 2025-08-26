@@ -1,0 +1,4 @@
+../Core/Src/menu.c:10:6:mainMenuDisplay	8
+../Core/Src/menu.c:58:6:mainMenuOnLeft	7
+../Core/Src/menu.c:92:6:mainMenuOnRight	7
+../Core/Src/menu.c:126:6:mainMenuOnPress	7

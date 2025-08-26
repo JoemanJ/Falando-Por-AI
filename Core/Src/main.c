@@ -27,6 +27,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "audio_processing.h"
+#include "LCD1602.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -98,7 +99,7 @@ int main(void)
   HAL_TIM_Base_Start(&htim2);
   HAL_ADC_Start_DMA(&hadc1, (uint32_t*) IN_BUFFER, BUFFER_SIZE/2);
   HAL_I2S_Transmit_DMA(&hi2s2, (uint16_t*) OUT_BUFFER, BUFFER_SIZE*2);
-
+  lcd_init();
   /* USER CODE END 2 */
 
   /* Infinite loop */

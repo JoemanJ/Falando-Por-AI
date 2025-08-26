@@ -55,9 +55,9 @@ void send_to_lcd (char data, int rs)
 	 * if the LCD still doesn't work, increase the delay to 50, 80 or 100..
 	 */
 	HAL_GPIO_WritePin(EN_GPIO_Port, EN_Pin, 1);
-	HAL_Delay(20);
+//	HAL_Delay(20);
 	HAL_GPIO_WritePin(EN_GPIO_Port, EN_Pin, 0);
-	HAL_Delay(20);
+//	HAL_Delay(20);
 }
 
 void lcd_send_cmd (char cmd)
