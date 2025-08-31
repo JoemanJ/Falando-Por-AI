@@ -1,3 +1,33 @@
+# Falando Por AI
+## O que é
+(Modulador de voz portátil em tempo real baseado em STM32)
+
+## Como usar
+(Componentes usados: STM32F411 "black pill", microfone MAX, módulo DAC)
+(*Obs: outras placas STM32 com: ADC de 12 bits, timer, interface I2S podem ser usadam, mas a configuração dos periféricos tem de ser feita manualmente nesses casos)
+
+(Clone o repositório)
+(Importe o projeto no STM32CubeIDE)
+(*Obs: Provavelmente dá pra fazer pelo PlatformIO e outros similares também, mas não sei como é o processo)
+
+(Faça um circuito como na imagem)
+
+# Como funciona
+
+## Componentes
+(pdf arrumadinho do documento "Componentes" no ClickUp)
+
+## Processo
+(Pipeline de processamento de áudio)
+(Configuração dos periféricos)
+(Interrupções e Double buffering)
+(Diagrama do projeto do clickup)
+(Explicação dos arquivos no repositório (principais nas pastas Core/\[Inc/src\])
+
+# Filtros e clonagem de voz
+(Biblioteca filters.c/h separada)
+(Clonagem de voz não é embarcada)
+
 ## Explicação dos Filtros:
 
 ### 1. Filtro Passa Baixa ⬇️:
@@ -233,7 +263,24 @@ float apply_pitchshifter(PitchShifter* ps, float input) {
 
 Todos os filtros customizados não introduzem um novo tipo de processamento de áudio, mas sim criam uma **cadeia de efeitos** (*effect chain*), combinando vários dos filtros e efeitos que vimos anteriormente para alcançar um resultado sonoro final, como por exemplo o efeito do **Darth Vader**.
 
+(Referência do lugar no código onde é possível ver isso)
+
 ---
 ## Clonagem de Voz por IA
 
 A clonegem de voz foi feita usando uma aplicação *Open-Source* chamada **Retrieval-based-Voice-Conversion-WebUI**. É possível seguir o passo a passo disponibilizado no Readme, em português, no seguinte [link](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI/blob/main/docs/pt/README.pt.md) do GitHub. Para **inferência**, é necessário uma máquina com **VRAM de 6Gb na placa de vídeo**. Já para o **treinamento** de um novo filtro de voz, por exemplo o famoso filtro do professor Zambon, é requisito mínimo **12Gb de VRAM na placa de vídeo**.
+
+# Work in Progress
+## Saída de som amplificada pelo dispositivo
+(Adição de um amplificador de áudio PAM + Speaker)
+(Microfonia)
+
+## Circuito completo com alimentação via bateria e interface
+(É pra ser realmente portátil)
+(LCD + botões)
+
+## Novos filtros
+(Testa e brincar)
+
+# Referências
+(coisas que estão no doc "Referências" no ClickUp)
