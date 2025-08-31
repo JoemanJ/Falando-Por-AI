@@ -1,28 +1,29 @@
 # Falando Por AI
 ## O que é
-O projeto consiste em um modulador de voz portátil em tempo real. Ele se baseia em um microprocessadr STM32 para processamento do filtros e coordenação dos outros componentes. Também usamo um microfone de eletreto para captura da voz, e um módulo DAC para conversão do audio digital processado de volta em analógico. O código é um projeto padrão realizado no STM32CubeIDE, sendo essa nossa ferramenta principal de desenvovimento. 
+O projeto é de um modulador de voz portátil em tempo real. Ele se baseia em um microcontrolador STM32 para processamento de sinal de áudio e coordenação dos outros componentes.
+Usamos um microfone de eletreto para capturar sinais de voz, o conversor ADC do próprio STM32 para digitalizar o sinal, e um módulo DAC para conversão do audio digital processado de volta em analógico. O código é um projeto padrão do STM32CubeIDE, nossa ferramenta principal de desenvovimento.
 
 ## Como usar
 Para usar nosso pojeto você precisará de alguns componentes essênciais:
--  STM32F411 (STM32 Blackpill)
--  MAX9814 (Módulo Amplificador Microfone Eletreto) 
+-  STM32F411CEU6 (STM32 Blackpill)
+-  MAX9814 (Módulo Microfone Eletreto com Amplificador) 
 -  PCM5102A (Módulo Conversor DAC)
   
->Outras placas STM32 com: ADC de 12 bits, timer, interface I2S podem ser usadam, mas a configuração dos periféricos tem de ser feita manualmente nesses casos.
+>Outras placas STM32 com: ADC de 12 bits, timer, interface I2S podem ser usadam, mas a configuração dos periféricos tem de ser feita manualmente nesses casos. Mais detalhes na sessão [Configuração de periféricos](#config_perifericos)
 
 Para usar nosso código recomendamos o uso do STM32CubeIDE que irá facilitar a importação do código e configuração dos perifericos do seu STM32.
-Com seu STM32CubeIDE baixado, basta clonar o nosso repositório em qualquer pasta do seu armazenamento e importar o projeto usando a IDE.
->É provável que outras IDE's também possibilitem o uso do nosso código, mas essa aplicação foge do nosso escopo de desenvolvimento e entendimento.
+Com seu STM32CubeIDE baixado, basta clonar o nosso repositório em qualquer pasta do seu armazenamento e importar o projeto usando a IDE. Para fazer isso, abra a IDE e vá em File->Import, escolha a opção General->Existing Projects into Workspace, seleciona a pasta do repositório clonado em "Select root directory" e clique em "Finish".
+>Também é possível usar outras IDEs e ferramentas (Por exemplo, PlatformIO) para compilar e fazer upload do código para a placa, mas isso exige configurações adicionais que não serão explicadas aqui.
 
 Com o código importado na sua IDE, basta conectar sua placa de desenvolvimento em um programador e upar o código para seu STM.
 
-Em seguida, conectw os componentes conforme a configuração visível na imagem a seguir:
+Em seguida, conecte os componentes conforme a imagem a seguir:
 
 (imagem)
 
 Por fim, alimente o seu STM32 e use um fone de ouvido na entrada p2 do seu DAC para escutar os efeitos aplicados na sua voz.
 
-A alteração dos filtros está configurada tanto para botões concetados no  pinoX (???) quanto no próprio botão "KEY" da plca STM. 
+O botão conectado ao pino B1 muda para o próximo efeito de voz de forma cíclica. A ordem padrão é: Darth Vader -> Optimus Prime -> Passa baixa (voz longe) -> Passa alta (efeito de rádio) -> Low pitch shift (voz grossa) -> High pitch shift (voz aguda). 
 
 # Como funciona
 
@@ -30,8 +31,9 @@ A alteração dos filtros está configurada tanto para botões concetados no  pi
 (pdf arrumadinho do documento "Componentes" no ClickUp)
 
 ## Processo
-(Pipeline de processamento de áudio)
-(Configuração dos periféricos)
+
+### (Pipeline de processamento de áudio)
+### <a name="config_perifericos"></a>(Configuração dos periféricos)
 (Interrupções e Double buffering)
 (Diagrama do projeto do clickup)
 (Explicação dos arquivos no repositório (principais nas pastas Core/\[Inc/src\])
