@@ -291,17 +291,9 @@ void DMA2_Stream0_IRQHandler(void)
 /* USER CODE BEGIN 1 */
 void HAL_GPIO_EXTI_Callback (uint16_t GPIO_Pin)
 {
-
-	if(GPIO_Pin == GPIO_PIN_0){
-		mainMenuOnLeft();
-	}
-	else if(GPIO_Pin == GPIO_PIN_1)
+	if(GPIO_Pin == GPIO_PIN_1)
 	{
-		mainMenuOnPress();
-	}
-	else if(GPIO_Pin == GPIO_PIN_2)
-	{
-		mainMenuOnRight();
+		CURRENT_FILTER++;
 	}
 }
 
