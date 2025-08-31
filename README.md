@@ -298,15 +298,17 @@ A clonegem de voz foi feita usando uma aplicação *Open-Source* chamada **Retri
 
 # Work in Progress
 ## Saída de som amplificada pelo dispositivo
-(Adição de um amplificador de áudio PAM + Speaker)
-(Microfonia)
+Pretendemos adicionar um módulo amplificador PAM8403 ligado a saída do DAC para permitir uma interface adicional que permite o uso de alto-falantes sem pré-aplificação. Desse modo, planejamos conectar em sequencia ao PAM um speaker simples para uma saída de áudio adicional.
+
+O problema desse novo apêndice é a realimenação do áudio do speaker de saída volta no microfone de entrada, podendo gerar uma microfonia que deve ser tratada de alguma forma a ser investida posteriormente (Via código e/ou de modo infraestrutural).
 
 ## Circuito completo com alimentação via bateria e interface
-(É pra ser realmente portátil)
-(LCD + botões)
+A ideia é que o dispositivo completo seja realmente portátil! Assim, pretendemos finalizar o circuito com uma parte de alimentação via baterias 9V para possibilitar o uso do aparelho sem que você estaja ancorado por um cabo de alimentação.
+
+Adicionalmente, pretendemos adiconar uma interface com o usuário para permitir a seleção e visualização dos filtros atráves de botões e um display LCD.
 
 ## Novos filtros
-(Testa e brincar)
+Existe uma infinidade de possibilidades para construão de novos filtros, seja concatenando filtros existentes, ou programando alguns novos. Por enquanto externamos 6 filtros diferentes, mas a ideia é produzir ainda mais!
 
 # Referências
 (coisas que estão no doc "Referências" no ClickUp)
