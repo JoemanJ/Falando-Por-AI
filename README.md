@@ -80,7 +80,7 @@ Algumas modificações foram feitas nos pinos para maior conveniência na hora d
   - Mode Circular
   - Increment Address: ligado apenas em "Memory"
   - Data Width: Half Word | Half Word
-- GPIO Settings:
+- <a id="I2S_pins"></a>GPIO Settings:
   - PB12: I2S2_WS
   - PB13: I2S2_CK
   - PB15: I2S2_SD
@@ -92,11 +92,11 @@ O contador conta até 501, com uma frequência de 24MHz (frequência configurada
 
 A saída do timer não está atrelada a nenhum pino.
 
-- CLK = 24MHz (Tanto ABP1 Timer clocks quanto ABP2 Timer clocks porque a gente não sabe qual é)
+- CLK = 24MHz (Tanto ABP1 Timer clocks quanto ABP2 Timer clocks)
 - Canais = nenhum (apenas contador. sem comparação)
 - Prescaler = 0
 - Modo = Up
-- Counter Period = 501 (24Mhz/501 = 47,904kHz)
+- Counter Period = 501 (24Mhz/501 = 47,904kHz, frequência maior que a frequência de transmissão do I²S)
 
 #### ADC1
 O ADC1 foi configurado para funcionar com sua resolução máxima (12 bits), iniciar conversões quando sempre que ocorrer um evento de atualização do Timer 2, e transmitir 
@@ -116,18 +116,91 @@ dados para memória através de um canal DMA. A leitura é feita pelo pino A1;
 >Note que é necessário configurar o canal DMA na aba "DMA Settings" antes de configurar a opção "DMA Continuous Requests"
 
 #### GPIO
+Além dos [pinos da interface I²S](#I2S_pins), O pino A1 foi configurado no modo como entrada para o canal 1 do ADC e o pino B1 foi configurado como donte de interrupção externa.
 
+O pino C13, conectado ao LED integrado na placa, foi configurado como saída digital para permitir sinalização de erro.
 
 ### Interrupções
+O loop principal do programa (loop infinito na função main()) é vazio por todo o processamento acontece de forma assíncrona por meio de callbacks de interrupção.
+
+Em especial, as funções callback mais relevantes são as que ocorrem quando a interface I¹S transmite uma transferência completa e meia transferência.
 
 ### Double buffering
+Afim de otimizar o tempo de processamento, o projeto usa uma abordagem de [*double buffering*](https://www.tecmundo.com.br/video/1410-o-que-e-double-buffering-.htm).
 
+Existe um buffer de entrada de dados (IN_BUFFER) e um buffer de saída de dados (OUT_BUFFER). Enquanto a interface I²S transmite a primeira metade do buffer de saída, o áudio na segunda metade do buffer de entrada é processado, e colocado na segunda metade do buffer de saída. Enquanto isso, a primeira metade do buffer de entrada é escrita pelo ADC.
 
-(Diagrama do projeto do clickup)
+Quando a primeira metade do buffer de saída é transmitida, essa lógica se inverte.
+
+O OUT_BUFFER tem o dobro do tamanho do IN_BUFFER, pois o protocolo I²S espera receber 2 sinais de áudio para transmitir áudio estéreo (um sinal para o canal esquerdo e outro para o canal direito). Na prática, como o microfone só capta um canal de som, o sinal processado é simplesmente colocado duas vezes no buffer de saída, resultando no mesmo som nos dois canais de áudio.
+
+Como a frequência de conversão do ADC é ligeiramente maior que a frequência de transmissão do I²S, é garantido que o I²S sempre tenha um buffer (ou uma metade de buffer) cheia para transmitir.
+
+### Ciclo de processamento
+Suponha que a interface I²S tenha acabado de transmitir um buffer completo de dados. A função de callback ```HAL_I2S_TxCpltCallback``` é chamada, com o trecho de código abaixo (o arquivo Core/Src/stm32f4xx_it.c que contém as callbacks de interrupção).
+
+Considere também que BUFFER_SIZE é 1024, ou seja, o buffer de entrada guarda um total de 1024 samples de áudio, enquanto o buffer de saída guarda 2048 (porque o sinal de saída é estereo).
+
+```C++
+void HAL_I2S_TxCpltCallback (I2S_HandleTypeDef * hi2s)
+{
+	count++;
+	if (count==48)
+	{
+		count = 0;
+		HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+	}
+	process_in_buffer = &(IN_BUFFER[BUFFER_SIZE/2]);
+	process_out_buffer = &(OUT_BUFFER[BUFFER_SIZE]);
+	HAL_ADC_Start_DMA(&hadc1, (uint32_t*) &(IN_BUFFER[0]), BUFFER_SIZE/2);
+	processHalfBuffer();
+}
+```
+A cada 48 buffers transmitidos, o LED da placa acende ou apaga. 1024*48 $\approx$ 48k. Com uma frequência de 48kHz, significa que o LED acende ou apaga a cada 1 segundo. Isso indica que o processamento de áudio está acontecendo de forma correta.
+
+Após incrementar a variável "count", a função troca as metades sendo processadas dos buffers para a segunda metade, e inicia a transmissão de dados do ADC para a primeira metade do buffer de entrada, enquanto a interface I²S automaticamente começa a transmitir a primeira metade do buffer de saída, que já está processado.
+
+Por fim, a função ```processHalfBuffer()``` é chamada. Seu código é como abaixo (presente no arquivo Core/Src/audio_processing.c):
+```C
+void processHalfBuffer()
+{
+	uint16_t int_input = 0;
+	float normalized_input = 0.0;
+	float normalized_output = 0.0;
+	int16_t int_output = 0;
+
+	uint16_t i = 0;
+	for (i=0; i<BUFFER_SIZE/2; i++)
+	{
+		int_input = process_in_buffer[i];
+		normalized_input = normalizeAudio(int_input);
+		normalized_output = processAudio(normalized_input) * OUTPUT_VOLUME; // COLOCAR EFEITO AQUI
+		int_output = deNormalizeAudio(normalized_output) ;
+		process_out_buffer[2*i] = int_output;
+		process_out_buffer[2*i+1] = int_output;
+	}
+
+	return;
+}
+```
+Esta função lê uma sample da metade do buffer a ser processada atualmente, no formato de um uint_16, normaiza esse valore convertendo-o para um float entre -1 e +1 (processamento de áudio com valores float é mais fácil, embora mais lento, que com valores inteiros), processa o sinal normalizado através da função ```processAudio()```, que aplica o filtro desejado, converte o resultado para um valor inteiro com sinal (que é o formato esperado pelo protocolo I²S) e coloca o resultado final nos 2 próximos índices do buffer de saída (para imitar uma saída estereo).
+
+Essa sequência se repete até que metade do buffer de entrada tenha sido processada.
+
+A função ```processAudio()``` (no mesmo arquivo) é simplesmente um bloco switch-case que chama a função de aplicação do filtro selecionado na entrada normalizada.
 
 
 ## Organização do Repositório
-(Explicação dos arquivos no repositório (principais nas pastas Core/\[Inc/src\]))
+A maioria dos arquivos nesse repositório são gerados automaticamente para todo projeto na STM32CubeIDE.
+
+Os arquivos de cabeçalho (.h) relevantes para o projeto se encontram na pastas Core/Inc. Os arquivos de implementação (.c) se encontram na pasta Core/Src.
+
+Um sumário dos arquivos mais importantes para o projeto:
+- audio_processing.h/c - contém funções para o pipeline de processamento de áudio
+- filters.h/c - Contém funções para configuração e uso dos filtros implementados
+- stm32f4xx_it.h/c - Contém as funções de callback para todas as interrupções usadas.
+
+A pasta filter_testing contém um exemplo do uso dos arquivos filter.h/c em um arquivo de áudio .wav.
 
 # Filtros e clonagem de voz
 A implementação dos filtros foi feita de forma que eles possam ser acoplados e desacoplados em qualquer projeto similar a este. Da forma como foi construída, as funções de filtro esperam receber amostras (um único valor por vez) sequenciais e normalizadas (*floats* entre -1.0 e 1.0) de um buffer de áudio, retornando as amostras com os filtros aplicados. Em outras palavras, seria possível, a título de exemplo, criar um programa em C usando os mesmos arquivos de filtro deste projeto (Filtro.h e Filtro.C) que leia um arquivo na extensão WAV, normalize os dados de áudio, aplique os filtros em cada amostra de dado e retorne o arquivo de áudio reconstruído, com o filtro aplicado. Uma aplicação dessa natureza pode ser vista na pasta `filter_testing`, especificamente em `filter_testing/filter_test.c`, onde experimentamos as implementações iniciais do filtro do **Darth Vader** em um arquivo de extensão WAV. 
