@@ -1,6 +1,8 @@
 ## Explicação dos Filtros:
 
-### 1. Filtro Passa Baixa:
+### 1. Filtro Passa Baixa ⬇️:
+
+O código a seguir implementa um **filtro passa-baixa (Low-Pass Filter - LPF)** de primeira ordem
 
 ```cpp
 // Initialize the low-pass filter
@@ -12,7 +14,7 @@ void lpf_init(LPF *f, float cutoff_freq, float sample_rate) {
 }
 ```
 
-A função `lpf_init` é responsável por configurar e inicializar as variáveis do filtro antes que ele possa ser usado. Ela alcula o **passo de tempo (`dt`)** ou o intervalo de tempo entre duas amostras consecutivas do áudio (inverso da taxa de amostragem). A fórmula $f_c=\frac{1}{2\pi RC}$ define a frequência de corte, e o código está apenas a rearranjando para encontrar RC a partir da `cutoff_freq`. E, por fim, o passo mais importante: calcula o coeficiente de suavização **`alpha`** . Este valor, que varia entre 0 e 1, determina o quão "forte" é o filtro.
+A função `lpf_init` é responsável por configurar e inicializar as variáveis do filtro antes que ele possa ser usado. Ela alcula o **passo de tempo (`dt`)** ou o intervalo de tempo entre duas amostras consecutivas do áudio (inverso da taxa de amostragem). A fórmula $f_c=\frac{1}{2\pi RC}$ define a frequência de corte, e o código está apenas a rearranjando para encontrar RC a partir da `cutoff_freq`. E, por fim, o passo mais importante: calcula o coeficiente de suavização **`alpha`**. Este valor, que varia entre 0 e 1, determina o quão "forte" é o filtro.
 
 ```cpp
 // Apply low-pass filter
@@ -25,9 +27,11 @@ float apply_lpf(LPF *f, float x) {
 
 `float y = f->alpha * x + (1.0f - f->alpha) * f->prev;` Esta é a **equação do filtro** em si. A nova amostra de saída (`y`) é uma **média ponderada** entre a amostra de entrada atual (`x`) e a amostra de saída anterior (`f->prev`). O coeficiente `alpha` controla o peso. A saída é uma combinação de `alpha` por cento da nova amostra e `(1 - alpha)` por cento da saída anterior.
 
+### 2. Filtro Passa Alta ⬆️:
 
-### 2. Filtro Passa Alta:
+O código a seguir implementa um **filtro passa-alta (High-Pass Filter - HPF)**.
 
+```cpp
 void hpf_init(HPF *f, float cutoff_freq, float sample_rate) {
     float dt = 1.0f / sample_rate;                  // Time step
     float RC = 1.0f / (2.0f * M_PI * cutoff_freq);  // RC time constant
@@ -35,6 +39,7 @@ void hpf_init(HPF *f, float cutoff_freq, float sample_rate) {
     f->prev_x = 0.0f;                               // Previous input sample
     f->prev_y = 0.0f;                               // Previous output sample
 }
+```
 
 A função `hpf_init` prepara as variáveis necessárias para o filtro, de forma muito similar à `lpf_init`.
 
@@ -46,10 +51,10 @@ float apply_hpf(HPF *f, float x) {
     return y;
 }
 ```
+
 E a função `apply_hpf` também funciona de maneira similar à `lpf_apply`.
 
-
-### 3. Distorção:
+### 3. Distorção 〰️:
 
 Este código implementa um dos efeitos de distorção de áudio mais simples e conhecidos: o **hard clipping** (ou ceifamento/corte abrupto). Diferente dos outros filtros, esse filtro não precisa de uma *struct* de controle.
 
@@ -60,11 +65,173 @@ float apply_distortion(float x, float threshold) {
     return x;
 }
 ```
+
 **`if (x > threshold) return threshold;`** : Se o valor da amostra de entrada (`x`) for **maior** que o limiar positivo (`threshold`), a função não retorna o valor original `x`, mas sim o próprio valor do `threshold`.
 
 **`if (x < -threshold) return -threshold;`** : Da mesma forma, se o valor da amostra for **menor** que o limiar negativo (`-threshold`), a função retorna o valor `-threshold`.
 
 **`return x;`** : Se a amostra estiver **dentro** dos limites (entre `-threshold` e `threshold`), ela passa pelo efeito sem nenhuma alteração.
 
+### 4. Eco 🗣:
 
-### 4. Eco:
+O código apresentado implementa um efeito de **eco** , também conhecido como **delay digital**. Este é um dos efeitos de áudio mais fundamentais, baseado no conceito de armazenar um som e reproduzi-lo um pouco mais tarde.
+
+```cpp
+// Initialize the echo effect
+// This function sets up the echo effect with a delay time and decay factor.
+void echo_init(Echo* e, float delay_ms, float decay, float sample_rate) {
+    e->delay_samples = (int)(sample_rate * delay_ms / 1000.0f);                     // Convert delay time to samples
+    if (e->delay_samples > MAX_DELAY_SAMPLES) e->delay_samples = MAX_DELAY_SAMPLES; // Clamp to max size
+    e->size = e->delay_samples;                                                     // Set size
+    e->index = 0;                                                                   // Reset index  
+    e->decay = decay;                                                               // Set decay factor
+    memset(e->buffer, 0, sizeof(e->buffer));                                        // Clear buffer
+}
+```
+
+**`e->delay_samples = (int)(sample_rate * delay_ms / 1000.0f);`**: Esta linha converte o tempo de atraso de milissegundos para o número correspondente de **amostras de áudio**. Por exemplo, com uma taxa de 44100 Hz e um delay de 500 ms, o eco precisará de `44100 * 500 / 1000 = 22050` amostras de atraso.
+
+**`if (e->delay_samples > MAX_DELAY_SAMPLES) ...`**: Uma verificação de segurança para garantir que o tempo de atraso solicitado não exceda o tamanho máximo do *buffer* de memória alocado (`MAX_DELAY_SAMPLES`), evitando erros de acesso à memória.
+
+**`memset(e->buffer, 0, sizeof(e->buffer));`**: Limpa completamente o *buffer* de áudio, preenchendo-o com zeros. Isso é crucial para garantir que não haja sons indesejados (lixo de memória) no início da aplicação do efeito.
+
+```cpp
+float apply_echo(Echo* e, float x) {
+    float delayed = e->buffer[e->index];    // Get delayed sample
+    float y = x + delayed * e->decay;       // Apply decay to delayed sample
+
+    e->buffer[e->index] = y;                // Store new sample in buffer
+    e->index = (e->index + 1) % e->size;    // Increment index circularly
+
+    return y;
+}
+
+```
+
+**`float delayed = e->buffer[e->index];`**: Lê uma amostra do *buffer* na posição atual do índice (`e->index`). Esta amostra é o som que foi armazenado `delay_samples` amostras atrás no tempo — ou seja, é o **som atrasado**.
+
+**`float y = x + delayed * e->decay;`**: Calcula a nova amostra de saída (`y`). Ela é a **soma** da amostra de entrada atual (`x`) com a amostra atrasada (`delayed`), que por sua vez é multiplicada pelo fator de decaimento (`e->decay`) para reduzir seu volume.
+
+**`e->buffer[e->index] = y;`**: **Armazena a nova amostra de saída (`y`) de volta no buffer**, na mesma posição de onde a amostra atrasada foi lida. Isso é o que cria as repetições contínuas (feedback). O som recém-criado será lido novamente no futuro para gerar o próximo eco.
+
+### 5. Reverb 📳:
+
+O código que você compartilhou implementa uma forma simplificada de **reverberação** (reverb), baseada em uma única linha de atraso com realimentação (*feedback*).
+
+```cpp
+// Initialize the reverb effect
+void reverb_init(Reverb* r, float delay_ms, float feedback, float mix, float sample_rate) {
+    int delay_samples = (int)(sample_rate * delay_ms / 1000.0f);                // Convert delay time to samples
+    if (delay_samples > MAX_DELAY_SAMPLES) delay_samples = MAX_DELAY_SAMPLES;   // Clamp to max size
+    r->size = delay_samples;                                                    // Set size
+    r->index = 0;                                                               // Reset index
+    r->feedback = feedback;                                                     // Set feedback amount             
+    r->mix = mix;                                                               // Set mix amount               
+    memset(r->buffer, 0, sizeof(r->buffer));                                    // Clear buffer
+}
+```
+
+A função `reverb_init` prepara o efeito, de maneira quase idêntica à do eco, mas com a adição de um novo parâmetro: `mix`.
+
+`float mix`: O nível de mistura. Controla a proporção entre o som original e o som com efeito. Um valor de 0 significa nenhum reverb, e 1 significa apenas o som do reverb.
+
+```cpp
+float apply_reverb(Reverb* r, float x) {
+    float delayed = r->buffer[r->index];                // Get delayed sample
+    float y = x * (1.0f - r->mix) + delayed * r->mix;   // Mix input with delayed sample
+
+    r->buffer[r->index] = x + delayed * r->feedback;    // Store new sample in buffer
+    r->index = (r->index + 1) % r->size;                // Increment index circularly
+
+    return y;
+}
+```
+
+**`float y = x * (1.0f - r->mix) + delayed * r->mix;`**: Esta é a linha de **mistura da saída**. Ela calcula o que o ouvinte irá escutar.
+
+* `x * (1.0f - r->mix)`: Pega a amostra de entrada (`x`) e a multiplica pela proporção de som sem efeito (`1 - mix`).
+* `delayed * r->mix`: Pega a amostra atrasada (`delayed`) e a multiplica pela proporção de som com efeito (`mix`).
+* O resultado `y` é a soma ponderada do som original e do som reverberado. Este controle de `mix` é típico de efeitos de reverb e permite ajustar o quão "distante" o som parece estar.
+
+**`r->buffer[r->index] = x + delayed * r->feedback;`**: Esta é a linha da **realimentação (feedback)**. Ela calcula o que será armazenado de volta no buffer para criar as próximas reflexões. No eco, a *saída final* era armazenada de volta no buffer. Aqui, o que é armazenado é a **soma da entrada atual (`x`) com a reflexão anterior atenuada (`delayed * r->feedback`)**.
+
+### 6. Pitch Shifter ◀️▶️:
+
+Este código implementa um efeito de **pitch shifter**, que altera a "altura" (a frequência fundamental) de um som.
+
+```cpp
+// Initialize the pitch shifter
+// pitch_factor: e.g. 0.7 for ~7 semitones down
+void pitchshifter_init(PitchShifter* ps, float pitch_factor, float sample_rate) {
+    memset(ps->buffer, 0, sizeof(ps->buffer));  // Clear buffer
+    ps->write_index = 0;                        // Reset write index
+    ps->read_index = 0.0f;                      // Reset read index
+    ps->pitch_factor = pitch_factor;            // Set pitch factor
+    ps->size = MAX_DELAY_SAMPLES;               // Set size to max delay samples
+}
+```
+
+`float pitch_factor`: O **fator de afinação**. Este é o número mais importante.
+
+* Um `pitch_factor` de **1.0** não altera o som.
+* Um `pitch_factor` **< 1.0** (ex: 0.5) **diminui** a afinação (som mais grave).
+* Um `pitch_factor` **> 1.0** (ex: 2.0) **aumenta** a afinação (som mais agudo).
+
+`int size`: O tamanho do *buffer* de memória que será usado para armazenar o áudio temporariamente.
+
+**`ps->read_index = 0.0f;`** : Inicializa o **ponteiro de leitura** . Note que ele é um `float`, pois ele se moverá em incrementos fracionários para alcançar a mudança de velocidade.
+
+**`ps->write_index = 0;`** : Inicializa o **ponteiro de escrita** . Este é um `int` porque ele sempre se move uma amostra por vez.
+
+```cpp
+// Linear interpolation helper
+static float lerp(float a, float b, float t) {
+    return a + t * (b - a);
+}
+
+// Process one sample with pitch shifting down
+float apply_pitchshifter(PitchShifter* ps, float input) {
+    ps->buffer[ps->write_index] = input;                    // Store input sample in buffer 
+
+    // Calculate read index
+    float output = 0.0f;                                    // Read sample at slower rate for pitch down
+    int idx1 = (int)ps->read_index;                         // Get integer part of read index
+    int idx2 = (idx1 + 1) % ps->size;                       // Get next index circularly
+    float frac = ps->read_index - idx1;                     // Fractional part for interpolation
+
+    // Linear interpolate between two samples
+    output = lerp(ps->buffer[idx1], ps->buffer[idx2], frac);
+
+    // Increment write index
+    ps->write_index = (ps->write_index + 1) % ps->size;
+
+    // Increment read index slower for pitch down
+    ps->read_index += ps->pitch_factor;
+    if (ps->read_index >= ps->size) {
+        ps->read_index -= ps->size;
+    }
+
+    return output;
+}
+```
+
+**Leitura e Interpolação**: Como o ponteiro de leitura (`read_index`) é um `float`, ele raramente cairá exatamente em uma posição inteira do *buffer. Tentar ler o valor de `buffer[10.5]` não é possível. A solução é a **interpolação linear**.
+
+* `int idx1 = (int)ps->read_index;`: Pega a parte inteira do ponteiro de leitura (ex: 10).
+* `int idx2 = (idx1 + 1) % ps->size;`: Pega o próximo índice no *buffer* (ex: 11).
+* `float frac = ps->read_index - idx1;`: Pega a parte fracionária (ex: 0.5).
+* `output = lerp(ps->buffer[idx1], ps->buffer[idx2], frac);`: A função `lerp` (Interpolação Linear) calcula um valor intermediário. Se `frac` é 0.5, ela retorna a média exata entre o valor em `idx1` e `idx2`. Isso "adivinha" qual seria o valor da onda sonora no ponto fracionário, resultando em um som muito mais suave do que simplesmente arredondar o índice.
+
+`ps->write_index = (ps->write_index + 1) % ps->size;`: O ponteiro de escrita **sempre avança de 1 em 1**, seguindo o ritmo normal do áudio.
+
+`ps->read_index += ps->pitch_factor;`: O ponteiro de leitura **avança na velocidade do `pitch_factor`**.
+
+* Se `pitch_factor` é 0.5, o ponteiro de leitura se move na metade da velocidade do de escrita. Ele está "lendo o passado" mais devagar, o que estica a onda sonora, resultando em um som mais grave.
+* Se `pitch_factor` é 2.0, ele lê duas vezes mais rápido, "pulando" amostras. Isso comprime a onda sonora, resultando em um som mais agudo.
+
+### 7. Filtros customizados:
+
+Todos os filtros customizados não introduzem um novo tipo de processamento de áudio, mas sim criam uma **cadeia de efeitos** (*effect chain*), combinando vários dos filtros e efeitos que vimos anteriormente para alcançar um resultado sonoro final, como por exemplo o efeito do **Darth Vader**.
+
+
+## Clonagem de Voz por IA
