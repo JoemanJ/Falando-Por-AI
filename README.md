@@ -2,7 +2,7 @@
 
 ### 1. Filtro Passa Baixa ⬇️:
 
-O código a seguir implementa um **filtro passa-baixa (Low-Pass Filter - LPF)** de primeira ordem
+O código a seguir implementa um **filtro passa-baixa (Low-Pass Filter - LPF)** de primeira ordem.
 
 ```cpp
 // Initialize the low-pass filter
@@ -125,8 +125,8 @@ void reverb_init(Reverb* r, float delay_ms, float feedback, float mix, float sam
     if (delay_samples > MAX_DELAY_SAMPLES) delay_samples = MAX_DELAY_SAMPLES;   // Clamp to max size
     r->size = delay_samples;                                                    // Set size
     r->index = 0;                                                               // Reset index
-    r->feedback = feedback;                                                     // Set feedback amount             
-    r->mix = mix;                                                               // Set mix amount               
+    r->feedback = feedback;                                                     // Set feedback amount           
+    r->mix = mix;                                                               // Set mix amount             
     memset(r->buffer, 0, sizeof(r->buffer));                                    // Clear buffer
 }
 ```
@@ -233,5 +233,7 @@ float apply_pitchshifter(PitchShifter* ps, float input) {
 
 Todos os filtros customizados não introduzem um novo tipo de processamento de áudio, mas sim criam uma **cadeia de efeitos** (*effect chain*), combinando vários dos filtros e efeitos que vimos anteriormente para alcançar um resultado sonoro final, como por exemplo o efeito do **Darth Vader**.
 
-
+---
 ## Clonagem de Voz por IA
+
+A clonegem de voz foi feita usando uma aplicação *Open-Source* chamada **Retrieval-based-Voice-Conversion-WebUI**. É possível seguir o passo a passo disponibilizado no Readme, em português, no seguinte [link](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI/blob/main/docs/pt/README.pt.md) do GitHub. Para **inferência**, é necessário uma máquina com **VRAM de 6Gb na placa de vídeo**. Já para o **treinamento** de um novo filtro de voz, por exemplo o famoso filtro do professor Zambon, é requisito mínimo **12Gb de VRAM na placa de vídeo**.
