@@ -37,8 +37,9 @@ A alteração dos filtros está configurada tanto para botões concetados no  pi
 (Explicação dos arquivos no repositório (principais nas pastas Core/\[Inc/src\])
 
 # Filtros e clonagem de voz
-(Biblioteca filters.c/h separada)
-(Clonagem de voz não é embarcada)
+A implementação dos filtros foi feita de forma que eles possam ser acoplados e desacoplados em qualquer projeto similar a este. Da forma como foi construída, as funções de filtro esperam receber amostras (um único valor por vez) sequenciais e normalizadas (*floats* entre -1.0 e 1.0) de um buffer de áudio, retornando as amostras com os filtros aplicados. Em outras palavras, seria possível, a título de exemplo, criar um programa em C usando os mesmos arquivos de filtro deste projeto (Filtro.h e Filtro.C) que leia um arquivo na extensão WAV, normalize os dados de áudio, aplique os filtros em cada amostra de dado e retorne o arquivo de áudio reconstruído, com o filtro aplicado.
+
+De forma adicional, este projeto se propôs a usar uma aplicação de Inteligência Artificial (IA) que clone a voz de qualquer pessoa. Entretanto, foram encontrados desafios ao tentar embarcar o modelo de IA no hardware do projeto, de forma que esta ideia fosse invibializada, sendo um possível desafio para projetos futuros. Por consequência, a aplicação de IA foi implementada à parte, em um hardware externo (um notebook com placa de vídeo dedicada).
 
 ## Explicação dos Filtros:
 
