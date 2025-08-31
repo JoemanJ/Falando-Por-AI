@@ -215,7 +215,7 @@ float apply_pitchshifter(PitchShifter* ps, float input) {
 }
 ```
 
-**Leitura e Interpolação**: Como o ponteiro de leitura (`read_index`) é um `float`, ele raramente cairá exatamente em uma posição inteira do *buffer. Tentar ler o valor de `buffer[10.5]` não é possível. A solução é a **interpolação linear**.
+**Leitura e Interpolação**: Como o ponteiro de leitura (`read_index`) é um `float`, ele raramente cairá exatamente em uma posição inteira do *buffer*. Tentar ler o valor de `buffer[10.5]` não é possível. A solução é a **interpolação linear**.
 
 * `int idx1 = (int)ps->read_index;`: Pega a parte inteira do ponteiro de leitura (ex: 10).
 * `int idx2 = (idx1 + 1) % ps->size;`: Pega o próximo índice no *buffer* (ex: 11).
