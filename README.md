@@ -263,7 +263,18 @@ float apply_pitchshifter(PitchShifter* ps, float input) {
 
 Todos os filtros customizados não introduzem um novo tipo de processamento de áudio, mas sim criam uma **cadeia de efeitos** (*effect chain*), combinando vários dos filtros e efeitos que vimos anteriormente para alcançar um resultado sonoro final, como por exemplo o efeito do **Darth Vader**.
 
-(Referência do lugar no código onde é possível ver isso)
+```cpp
+float apply_darthvader(DarthVader* dv, float x) {
+
+    x = apply_pitchshifter(&dv->ps, x);                 // Apply pitch shifter
+    x = apply_distortion(x, dv->distortion_threshold);  // Apply distortion
+    x = apply_equalizer(&dv->eq, x);                    // then equalizer
+    x = apply_reverb(&dv->reverb, x);                   // reverb
+    x = apply_volume_gain(x, dv->volume_gain);          // volume gain last
+
+    return x;
+}
+```
 
 ---
 ## Clonagem de Voz por IA
