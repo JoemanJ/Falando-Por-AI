@@ -116,7 +116,7 @@ float apply_echo(Echo* e, float x) {
 
 ### 5. Reverb 📳:
 
-O código que você compartilhou implementa uma forma simplificada de **reverberação** (reverb), baseada em uma única linha de atraso com realimentação (*feedback*).
+O código implementa uma forma simplificada de **reverberação** (reverb), baseada em uma única linha de atraso com realimentação (*feedback*).
 
 ```cpp
 // Initialize the reverb effect
