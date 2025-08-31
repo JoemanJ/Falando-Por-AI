@@ -1,6 +1,7 @@
 # Falando Por AI
 ## O que é
 (Modulador de voz portátil em tempo real baseado em STM32)
+O projeto consiste em um modulador de voz portátil em tempo real. Ele se baseia em um microprocessadr STM32 para processamento do filtros e coordenação dos outros componentes. Também usamo um microfone de eletreto para captura da voz, e um módulo DAC para conversão do audio digital processado de volta em analógico. O código é um projeto padrão realizado no STM32CubeIDE, sendo essa nossa ferramenta principal de desenvovimento. 
 
 ## Como usar
 (Componentes usados: STM32F411 "black pill", microfone MAX, módulo DAC)
