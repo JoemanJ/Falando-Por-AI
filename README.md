@@ -402,4 +402,16 @@ Adicionalmente, pretendemos adiconar uma interface com o usuário para permitir 
 Existe uma infinidade de possibilidades para construção de novos filtros, seja isso concatenando filtros existentes ou programando alguns novos. Por enquanto externamos 6 filtros diferentes, mas a ideia é criar ainda mais!
 
 # Referências
-(coisas que estão no doc "Referências" no ClickUp)
+[Datasheet do Microfone MAX9814](https://www.alldatasheet.com/datasheet-pdf/download/217128/MAXIM/MAX9814.html)
+
+[Datasheet do DAC PCM5102A](https://www.alldatasheet.com/datasheet-pdf/pdf/788993/TI1/PCM5102A.html)
+
+[Datasheet do chip STM32F411CEU6](https://www.st.com/en/microcontrollers-microprocessors/stm32f411ce.html)
+
+[Datasheet da placa STM32F411CEU6](https://stm32-base.org/boards/STM32F411CEU6-WeAct-Black-Pill-V2.0.html)
+
+[Post de blog sobre o uso do DAC PCM5102A](https://macsbug.wordpress.com/?s=DAC+module)
+
+[Vídeo do DigiKey sobre STM32 trabalhando com um DAC](https://www.youtube.com/watch?v=EsZLgqhqfO0)
+
+[Vídeo da playlist do Phil's Lab sobre processamento de audio digital usando um STM32](https://www.youtube.com/watch?v=VDhmVrbSpqA)
