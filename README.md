@@ -7,9 +7,9 @@ Usamos um microfone de eletreto para capturar sinais de voz, o conversor ADC do 
 Para usar nosso pojeto você precisará de alguns componentes essênciais:
 -  STM32F411CEU6 (STM32 Blackpill)
 -  MAX9814 (Módulo Microfone Eletreto com Amplificador) 
--  PCM5102A (Módulo Conversor DAC)
+-  PCM5102A (Módulo Conversor DAC) ([IMPORTANTE!](#DAC))
   
->Outras placas STM32 com: ADC de 12 bits, timer, interface I2S podem ser usadam, mas a configuração dos periféricos tem de ser feita manualmente nesses casos. Mais detalhes na sessão [Configuração de periféricos](#config_perifericos)
+>Outras placas STM32 com: ADC de 12 bits, timer, interface I²S podem ser usadam, mas a configuração dos periféricos tem de ser feita manualmente nesses casos. Mais detalhes na sessão [Configuração de periféricos](#config_perifericos)
 
 Para usar nosso código recomendamos o uso do STM32CubeIDE que irá facilitar a importação do código e configuração dos perifericos do seu STM32.
 Com seu STM32CubeIDE baixado, basta clonar o nosso repositório em qualquer pasta do seu armazenamento e importar o projeto usando a IDE. Para fazer isso, abra a IDE e vá em File->Import, escolha a opção General->Existing Projects into Workspace, seleciona a pasta do repositório clonado em "Select root directory" e clique em "Finish".
@@ -19,7 +19,7 @@ Com o código importado na sua IDE, basta conectar sua placa de desenvolvimento 
 
 Em seguida, conecte os componentes conforme a imagem a seguir:
 
-(imagem)
+![Diagrama de conexão dos componentes](circuit_diagram.jpg)
 
 Por fim, alimente o seu STM32 e use um fone de ouvido na entrada p2 do seu DAC para escutar os efeitos aplicados na sua voz.
 
@@ -28,15 +28,106 @@ O botão conectado ao pino B1 muda para o próximo efeito de voz de forma cícli
 # Como funciona
 
 ## Componentes
-(pdf arrumadinho do documento "Componentes" no ClickUp)
+O arquivo "Componentes.md" na raiz desse repositório tem uma coletãnea de informações úteis sobre os componentes usados no projeto.
 
+### <a id="DAC"></a>Informações importantes sobre o módulo DAC 5102A
+
+>Caso queira pular a explicação, [clique aqui](#DAC_skip).
+
+O embora o CHIP DAC 5102A tenha um datasheet extenso e de fácil acesso, a documentação do MÓDULO usado no projeto (plaquinha roxa com o chip 5102A e outros componentes pré-soldados) é muito mais escassa. A melhor documentação que encontramos foi [este pdf](https://macsbug.wordpress.com/wp-content/uploads/2021/02/pcm5102a_dac_schematic.pdf) do blog japonês [macsbug](macsbug.wordpress.com).
+
+Basicamente, o módulo possui pinos numerados de 1 a 4 na parte de cima da placa, que correspondem aos pinos FLT, DEMP, XSMT e FMT do chip 5102A, respectivamente. Na parte inferior da placa existem 4 conjuntos de 3 contatos nomeados HxL, com x variande de 1 a 4.
+
+- O contato próximo à letra H (de High) está conectado à tensão de entrada da placa.
+- O contato próximo à letra L (de Low) está conectado ao ground da placa
+- O contato do meio está conectado ao pino de número correspondente (e.g, o contato do meio do conjunto H1L está conectado ao pino FLT do chip)
+
+Para a maioria das aplicações com o chip 5102A (incluindo este projeto) a tensão desses pinos não varia, então para evitar o uso de fios ligando esses pinos nas respectivas tensões, a tensão dos pinos pode ser configurada soldando um contato permanente entre os contatos do meio e os contatos de H ou L. Caso isso não seja feito, é necessário usar fios.
+
+Na parte de cima da placa, próximo aos pinos SCK e BCK, também é possível ver uma dupla de contatos que estão internamente ligados ao pino SCK e ao ground da placa. De forma similar, esses contatos também foram projetados para fechar um contato permanente com solda entre SCK e GND da placa, ativando o modo de "geração automática de clock" (ver datasheet do ship 5102A para mais informações).
+
+<a id="DAC_skip"></a>Para este projeto, soldamos os contatos exatamente como mostra [este pdf](https://macsbug.wordpress.com/wp-content/uploads/2021/02/pcm5102a_dac_schematic.pdf), ou seja:
+- Pinos 1, 2 e 4 ligados em L (GND)
+- Pino 3 ligado em H (Vin)
+- Pino SCK ligado em GND (contato de cima da placa fechado com solda)
 ## Processo
 
-### (Pipeline de processamento de áudio)
-### <a name="config_perifericos"></a>(Configuração dos periféricos)
-(Interrupções e Double buffering)
+### Pipeline de processamento de áudio
+O sinal de áudio (analógico) é capturado pelo microfone e convertido em sinal digital pelo conversor ADC do STM32. O sinal digital é então processado usando diversos filtros de áudio pelo STM32, e então transmitido através do protocolo I²S para o módulo DAC, onde é convertido novamente para um sinal analógico.
+
+A transmissão de dados entre o ADC e a memória e entre a memória e o DAC (pelo protocolo I²S) é feita através de canais DMA do STM32.
+
+### <a id="config_perifericos"></a>Configuração dos periféricos do STM32
+Todos os periféricos usados da placa foram configurados através da interface gráfica do STM32CubeIDE. é possível ver e modificar essas configurações abrindo o arquivo "Falando por AI.ioc" (na raíz do repositório) pelo STM32CubeIDE.
+
+Abaixo está um resumo das configurações. Opções não mencionadas foram deixadas como padrão.
+
+#### Clocks (aba Clock Configuration da STM32CubeIDE)
+HCLK foi configurado para 48MHz, frequência suficiente para processar todos os filtros implementados em tempo real. (Ao definir este valor, a IDE configurou automaticamente outras configurações de clock necessárias).
+
+APB1 Prescaler e APB2 Prescaler foram definidos como "/4" para que a frequência dos timer fosse de 24MHz.
+
+#### I2S2
+A interface I2S2 foi configurada para transmitir continuamente dados de áudio de 16 bits em uma frequência de 48kHz pelo protocolo Philips 2²S usando um canal DMA.
+Algumas modificações foram feitas nos pinos para maior conveniência na hora da montagem.
+
+- Mode: Half-Duplex Master
+- Transmission Mode: Mode Maser Transmit
+- Communication Standard: I2S Philips
+- Data and Frame Format: 16 Bits Data on 16 Bits Frame
+- Selexted Audio Frequency: 48 KHz (real audio frequency 47,348 kHz)
+- DMA Settings:
+  - Mode Circular
+  - Increment Address: ligado apenas em "Memory"
+  - Data Width: Half Word | Half Word
+- GPIO Settings:
+  - PB12: I2S2_WS
+  - PB13: I2S2_CK
+  - PB15: I2S2_SD
+
+#### Timer 2 (TIM2)
+O timer 2 foi configurado para gerar um sinal (Update Event) em uma frequência de 47,904 Hz (proxima da frequência de transmissão de áudio de 48kHz). este sinal será usado para começar uma conversão do ADC, gerando assim uma taxa de amostragem de (aproximadamente) 48kHz.
+
+O contador conta até 501, com uma frequência de 24MHz (frequência configurada para APB timer clock), e gera um evento sinal toda vez que sua contagem chega em 501 e reinicia do 0.
+
+A saída do timer não está atrelada a nenhum pino.
+
+- CLK = 24MHz (Tanto ABP1 Timer clocks quanto ABP2 Timer clocks porque a gente não sabe qual é)
+- Canais = nenhum (apenas contador. sem comparação)
+- Prescaler = 0
+- Modo = Up
+- Counter Period = 501 (24Mhz/501 = 47,904kHz)
+
+#### ADC1
+O ADC1 foi configurado para funcionar com sua resolução máxima (12 bits), iniciar conversões quando sempre que ocorrer um evento de atualização do Timer 2, e transmitir 
+dados para memória através de um canal DMA. A leitura é feita pelo pino A1;
+
+- IN1 habilitada (pino PA1)
+- Mode: Independent mode
+- Clock Prescaler: PCLK2 divided by 2
+- Resolution: 12 bits
+- Data Alignment: right alignment (padrão)
+- DMA Continuous Requests: Enabled
+- External Trigger Conversion Source: Timer 2 Trigger Out event
+- DMA Settings:
+  - Mode: Normal
+  - Data Width: Half Word | Half Word
+
+>Note que é necessário configurar o canal DMA na aba "DMA Settings" antes de configurar a opção "DMA Continuous Requests"
+
+#### GPIO
+
+
+### Interrupções
+
+### Double buffering
+
+
 (Diagrama do projeto do clickup)
-(Explicação dos arquivos no repositório (principais nas pastas Core/\[Inc/src\])
+
+
+## Organização do Repositório
+(Explicação dos arquivos no repositório (principais nas pastas Core/\[Inc/src\]))
 
 # Filtros e clonagem de voz
 A implementação dos filtros foi feita de forma que eles possam ser acoplados e desacoplados em qualquer projeto similar a este. Da forma como foi construída, as funções de filtro esperam receber amostras (um único valor por vez) sequenciais e normalizadas (*floats* entre -1.0 e 1.0) de um buffer de áudio, retornando as amostras com os filtros aplicados. Em outras palavras, seria possível, a título de exemplo, criar um programa em C usando os mesmos arquivos de filtro deste projeto (Filtro.h e Filtro.C) que leia um arquivo na extensão WAV, normalize os dados de áudio, aplique os filtros em cada amostra de dado e retorne o arquivo de áudio reconstruído, com o filtro aplicado. Uma aplicação dessa natureza pode ser vista na pasta `filter_testing`, especificamente em `filter_testing/filter_test.c`, onde experimentamos as implementações iniciais do filtro do **Darth Vader** em um arquivo de extensão WAV. 
